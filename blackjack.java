@@ -1,7 +1,7 @@
 import java.util.*;
 
 /** Small BlackJack game to test out and maintain skills I learned 
- * in my Programming 101 (CSE142) course.
+ * in from a Programming 101 (CSE142) course I took.
  * @author Andrew Knapp
  * @version 1.0
  */
