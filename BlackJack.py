@@ -51,19 +51,22 @@ def suitType(card):
 	    return types
 
 def findWinner(player_total, dealer_total, bet, money):
-    if player_total <= 21:
+    if player_total <= 21 and dealer_total <= 21:
 	 print "You have " + str(player_total) + " dealer has " + str(dealer_total)
 	 if player_total == dealer_total:
 	   print "Push"
-	 elif player_total < 21 and dealer_total < 21 and player_total > dealer_total:
+	 elif player_total > dealer_total:
 	   print "You won!"
 	   money = money + bet
 	 else:
 	   print "House wins."
 	   money = money - bet
-    else:
-	 print "House wins."
-	 money = money - bet
+    elif dealer_total > 21:
+	print "Dealer Busts.  You win!"
+	money = money + bet
+    else: 
+	print "House wins."
+	money = money - bet
     return money
 
 def playGame(bet, money):
@@ -112,9 +115,9 @@ def playGame(bet, money):
 
 def winLoss():
     if money > 100:
-	print "You won " + str(money - 100)
+	print "You won $" + str(money - 100)
     else:
-	print "You lost " + str(100 - money)
+	print "You lost $" + str(100 - money)
 	    
 #Function Call Area
 intro()
