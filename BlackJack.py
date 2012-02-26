@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 # BlackJack v1.0 By Andrew Knapp
 # This is a port (with some changes) of the Java version of BlackJack I wrote
 import random
