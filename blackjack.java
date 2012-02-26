@@ -1,78 +1,142 @@
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.ArrayList;
 
-/** Small BlackJack game to test out and maintain skills I learned 
- * from a Programming 101 (CSE142) course I took.
+/** 
+ * Small BlackJack game for fun
  * @author Andrew Knapp
- * @version 1.0
+ * @version 3.0 - Created card object to represent cards, simplified building of deck, made import libraries more
+ * 			concise.
  */
 public class blackjack {
 
-	public static final int INITIAL_MONEY = 100; 
-	 
+	public static final int INITIAL_MONEY = 100;	
+	public static final String[] suites = {"Hearts", "Spades", "Clubs", "Diamonds"};
+	public static final String[] cards = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
+
 	public static void main(String[] arg)	{
-		Random draw = new Random();
 		Scanner console = new Scanner(System.in);
+		List<Card> newDeck = new ArrayList<Card>();
+		newDeck = buildDeck(suites, cards);
 		int money =	INITIAL_MONEY;
 		intro(money);
 		boolean play = true;
-		
+
 		while (money > 0 && play == true) {
-			int card2 = 0;
-			int dealer = 0;
-			int total = 0;
-			boolean ace = false;
-			int to_play = betAmount(money, console);
+
+			//Running card score
+			int playerTotal = 0;
+			int dealerTotal = 0;
+
+			//For future development (Split, Double Down, etc)
+			List<Card> playersCards = new ArrayList<Card>(); 
+			List<Card> dealersCards = new ArrayList<Card>();
+
+			//deck setup
+			newDeck = shuffleDeck(newDeck);
+			int roundBet = betAmount(money, console);
+
+			//Initial Deal
+			
 			System.out.print("First card: ");
-			total = dealCards(total, card2, dealer, draw, ace);
+			playerTotal += drawCard(newDeck, playerTotal, playersCards);
+			
 			System.out.print("Second card: ");
-			card2 = dealCards(total, card2, dealer, draw, ace);
-			System.out.print("Dealer gets: ");
-			dealer = dealCards(total, card2, dealer, draw, ace);
-			int dealer1 = dealer;
-			total += card2;
-			ace = aceCheck(total, card2, dealer1, dealer);
+			playerTotal += drawCard(newDeck, playerTotal, playersCards);		
+			System.out.println();
+
+			System.out.println("Dealer showing: ");
+			dealerTotal += drawCard(newDeck, dealerTotal, dealersCards);
+			System.out.println("Dealer has: " + dealerTotal);
+
+			//Player play portion
 			boolean another_card = true;
-			while (total < 21 && another_card == true){
-					another_card = Hit(total, console);
-					if (total > 21 || total == 21 || another_card == false) {
+			while (playerTotal < 21 && another_card){
+					another_card = Hit(playerTotal, console);
+					if (playerTotal > 21 || playerTotal == 21 || !another_card) {
 						break;
-					}	
-					total += dealCards(total, card2, dealer, draw, ace);
-					if (ace == true && total > 21) {
-						total -= 10;
+					} else {
+						playerTotal += drawCard(newDeck, dealerTotal, dealersCards);
 					}
+					
+					for(int i = 0; i < playersCards.size(); i++){
+						if (playersCards.get(i).isAce() && playerTotal > 21) {
+							playerTotal -= 10;
+						}
+					}		
 			}
-			while (dealer < 17 && total < 21) {
-				System.out.println("Dealer showing: " + dealer);
-				dealer += dealCards(total, card2, dealer, draw, ace);
-				boolean dealer_ace = aceCheck(total, card2, dealer1, dealer);
-				if (dealer_ace == true && dealer > 21) {
-					dealer -= 10;
-				} 
+			
+			//Dealer play portion
+			while (dealerTotal < 17 && playerTotal < 21) {
+				System.out.println("Dealer showing: " + dealerTotal);
+				Card dealerCard = newDeck.remove(0);
+				
+				System.out.println("Dealer gets: ");
+				dealerCard.printCard();
+				dealerTotal += dealerCard.giveValue(dealerTotal);
+				dealersCards.add(dealerCard);
+				
+				//doesn't work
+				for(int i = 0; i < dealersCards.size(); i++){
+					if (dealersCards.get(i).isAce() && dealerTotal > 21) {
+						playerTotal -= 10;
+					}
+				}
 			}
-			money += winCheck(total, dealer, to_play);
+
+			//Decide who wins and whether to play another round
+			System.out.println();
+			money += winCheck(playerTotal, dealerTotal, roundBet);
 			play = playAgain(console, money);
 		}
 	}
 	
-	/** Ace exception call to see if the ace should be a 1 or 11
-	 * 
-	 * @param total running total of players cards
-	 * @param card2 card that is an ace
-	 * @param dealer1 dealer amount 
-	 * @param dealer running total of dealer amount
-	 * @return a boolean
-	 */
-	public static boolean aceCheck(int total, int card2, int dealer1, int dealer){
-		if (total - card2 == 11 || dealer1 == 11 || dealer - 11 == dealer1) {
-			return true;
-		} else {
-			return false;
-		}
+	public static int drawCard(List<Card> newDeck, int playerTotal, List<Card> playersCards){
+		int total = 0;
+		Card playerCard1 = newDeck.remove(0);
+		playerCard1.printCard();
+		total += playerCard1.giveValue(playerTotal);
+		playersCards.add(playerCard1);
+		return total;
 	}
 	
-	/** Checks to see if the player or the dealer won
-	 * 
+	/**
+	 * Constructs a deck given the suites and cards.
+	 * @param suites
+	 * @param name
+	 * @return a constructed deck
+	 */
+	public static List<Card> buildDeck(String[] suites, String[] name){
+		List<Card> deck = new ArrayList<Card>();
+		for (int i = 0; i < suites.length; i++){
+			for (int j = 0; j < name.length; j++){
+				Card k = new Card(name[j], suites[i]);
+				deck.add(k);
+			}
+		}
+		return deck;
+	}
+
+	/** 
+	 * Shuffles the cards so that they are in random order
+	 * @param deck of cards
+	 * @return a new shuffled deck
+	 */
+	public static List<Card> shuffleDeck(List<Card> deck){
+		List<Card> shuffledDeck = new ArrayList<Card>();
+		int r = 0;
+		while (deck.size() > 0){
+			Random card = new Random();
+			r = card.nextInt(deck.size());
+			Card temp = deck.remove(r);
+			shuffledDeck.add(temp);
+		}
+		return shuffledDeck;
+	}
+
+	/** 
+	 * Checks to see if the player or the dealer won
 	 * @param total running total of player's cards
 	 * @param dealer running total of dealer's cards
 	 * @param to_play
@@ -105,14 +169,15 @@ public class blackjack {
 		} else {
 			System.out.println("You have: " + total);
 			System.out.println("Dealer has: " + dealer);
-			System.out.println("You beat the dealer!  You win!");
+			System.out.println("You beat the dealer!");
+			System.out.println("You win!");
 			gains_losses = 2 * to_play;
 		}
 		return gains_losses;
 	}
-	
-    /** The bet amount for each round, subtracting from total
-     * 
+
+    /** 
+     * The bet amount for each round, subtracting from total
      * @param money money for each round
      * @param console allow for user interaction
      * @return the bet on the game
@@ -131,46 +196,9 @@ public class blackjack {
 		}
 		return bet;
 	}
-   
-	/** Deals the cards for each round
-	 * 
-	 * @param total running total of player's cards
-	 * @param card2 value of 2nd card dealt
-	 * @param dealer running total of dealer's cards
-	 * @param draw chooses a random value between 1-13 as a simple card value
-	 * @param ace boolean to decide if the aceCheck method needs to be called
-	 * @return the card drawn
-	 */
-	public static int dealCards(int total, int card2, int dealer, 
-											Random draw, boolean ace) {
-		int card = draw.nextInt(12) + 1;
-		if (card == 11) {
-			System.out.println("Jack");
-			card = 10;
-		} else if (card == 12) {
-			System.out.println("Queen");
-			card = 10;
-		} else if (card == 13) {
-			System.out.println("King");
-			card = 10;
-		} else if (card == 1) {
-			System.out.println("Ace");
-			if (dealer <= 10 && card2 > 0 || total <= 10) {
-				card = 11;
-				return card;
-			} else if (ace == true && total > 21 || total > 11) {
-				card = 1;
-			} else {
-				card = 1;
-			}		
-		} else {
-			System.out.println(card);
-		}
-		return card;
-	}
-	
-	/** To decide if they want to hit or not
-	 * 
+   	
+	/** 
+	 * To decide if they want to hit or not
 	 * @param running total of player's cards
 	 * @param console user interaction
 	 * @return true or false if the player wants to hit
@@ -191,9 +219,9 @@ public class blackjack {
         }
 		return ans;
 	}	
-	
-	/** Allows the user to decide if they are going to play again
-	 * 
+
+	/** 
+	 * Allows the user to decide if they are going to play again
 	 * @param console user interaction
 	 * @param money total money the player has
 	 * @return true or false if the user wants to play again
@@ -225,14 +253,82 @@ public class blackjack {
       }
 		return ans;
 	}
-	
-	/** Prints the introduction to the game
-	 * 
+
+	/** 
+	 * Prints the introduction to the game
 	 * @param money total money that the user is given
 	 */
    public static void intro(int money) {
 		System.out.println("Welcome to BlackJack!");
 		System.out.println();
 		System.out.println("You have: $" + money);
+   }
+   
+   /**
+    * Card Object
+    * @author acknapp
+    */
+   public static class Card{
+	   private int value;
+	   private String name;
+	   private String suite;
+	   private boolean Ace;
+	   
+	   /**
+	    * Card Constructor
+	    * @param name of card
+	    * @param suite of card
+	    */
+	   public Card(String name, String suite){
+		   this.name = name;
+		   this.suite = suite;
+		   this.value = determineCardValue(name);
+	   }
+	   
+	   /**
+	    * Prints the name of the card
+	    */
+	   public void printCard(){
+		   System.out.println(this.name + " of " + this.suite);
+	   	}
+	   
+	   /**
+	    * Gives the value of the card
+	    * @return value
+	    */
+   		public int giveValue(int playerTotal){
+   			return this.value;
+   		}
+   		
+   		/**
+   		 * Check if this card is an Ace
+   		 * @return Ace
+   		 */
+   		public boolean isAce(){
+   			return Ace;
+   		}
+	   
+	   /**
+		 * Given the name of a card, determines the value of that card
+		 * @param name the given card
+		 * @return value of the card
+		 */
+		private int determineCardValue(String name) throws NumberFormatException{
+			int value = 0;
+			try{
+				value = Integer.parseInt(name.substring(0,1));
+				return value;
+			} catch (NumberFormatException e){
+				if (name.charAt(0) == 'K' || name.charAt(0) == 'J' || name.charAt(0) == 'Q' || name.charAt(0) == '0'){
+					value = 10;
+				} else if (name.charAt(0) =='A'){
+					value = 11;
+					this.Ace = true;
+				} else {
+					value = Integer.parseInt(name.substring(0, 1)); 
+				}
+				return value;
+			}
+		}
    }
 }
