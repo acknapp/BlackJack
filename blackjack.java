@@ -254,10 +254,10 @@ public class blackjack {
 		return ans;
 	}
 
-	/** 
-	 * Prints the introduction to the game
-	 * @param money total money that the user is given
-	 */
+   /** 
+    * Prints the introduction to the game
+    * @param money total money that the user is given
+    */
    public static void intro(int money) {
 		System.out.println("Welcome to BlackJack!");
 		System.out.println();
