@@ -107,7 +107,7 @@ def play_game(bet, money):
     print("Dealer gets: {} of {}".format(get_card_type(dealer_card1), get_suit_type(dealer_card1)))
     print("Dealer showing: {}".format(str(dealer_total)))
     print("You have: {}".format(str(player_total)))
-    ans = raw_input('Do you want to hit? ')
+    ans = input('Do you want to hit? ')
     while choice(ans) and player_total < 21:
         player_card = deck.pop()
         cards.append(player_card)
@@ -120,7 +120,7 @@ def play_game(bet, money):
             print("You Busted.")
         else:
             print("You have: {}".format(str(player_total)))
-            ans = raw_input('Do you want to hit? ')
+            ans = input('Do you want to hit? ')
     while dealer_total <= 17 and player_total < 21:
         dealer_card = deck.pop()
         cards.append(dealer_card)
@@ -144,10 +144,10 @@ def win_loss():
 intro()
 ans = 'y'
 while choice(ans):
-    amount = raw_input("How much do you want to bet? ")
+    amount = input("How much do you want to bet? ")
     while amount.isalpha():
         print("That is not a number")
-        amount = raw_input("How much do you want to bet? ")
+        amount = input("How much do you want to bet? ")
     bet = int(amount)
     money = play_game(bet, money)
     print("You have ${}".format(str(money)))
@@ -155,5 +155,5 @@ while choice(ans):
         print("You are out of money.")
         break;
     else:
-        ans = raw_input('Do you want to play again? ')
+        ans = input('Do you want to play again? ')
 win_loss() 
