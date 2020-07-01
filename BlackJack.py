@@ -14,8 +14,8 @@ deck = ['AC', '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C',
 
 def intro():
     """Intro function"""
-    print "Welcome to Black Jack!"
-    print "You have: $" + str(money)
+    print("Welcome to Black Jack!")
+    print("You have: ${}".format(str(money)))
 
 
 def choice(ans):
@@ -29,7 +29,7 @@ def choice(ans):
 def check_money():
     """Check to see if the player has money to play"""
     if money == 0:
-        print "You're out of money. House wins."
+        print("You're out of money. House wins.")
         return False
 
 
@@ -69,20 +69,20 @@ def get_suit_type(card):
 def find_winner(player_total, dealer_total, bet, money):
     """Determine the winner of a hand"""
     if player_total <= 21 and dealer_total <= 21:
-        print "You have " + str(player_total) + " dealer has " + str(dealer_total)
+        print("You have {} dealer has {}".format(str(player_total), str(dealer_total)))
         if player_total == dealer_total:
-            print "Push"
+            print("Push")
         elif player_total > dealer_total:
-            print "You won!"
+            print("You won!")
             money = money + bet
         else:
-            print "House wins."
+            print("House wins.")
             money = money - bet
     elif dealer_total > 21:
-        print "Dealer Busts.  You win!"
+        print("Dealer Busts.  You win!")
         money = money + bet
     else:
-        print "House wins."
+        print("House wins.")
         money = money - bet
     return money
 
@@ -95,38 +95,38 @@ def play_game(bet, money):
     random.shuffle(deck)
     player_card1 = deck.pop()
     cards.append(player_card1)
-    print "1st card: " + get_card_type(player_card1) + " of " + get_suit_type(player_card1)
+    print("1st card: {} of {}".format(get_card_type(player_card1), get_suit_type(player_card1)))
     player_total += get_card_value(player_card1, player_total)
     player_card2 = deck.pop()
     cards.append(player_card2)
-    print "2nd card: " + get_card_type(player_card2) + " of " + get_suit_type(player_card2)
+    print("2nd card: {} of {}".format(get_card_type(player_card2), get_suit_type(player_card2))) 
     player_total += get_card_value(player_card2, player_total)
     dealer_card1 = deck.pop()
     dealer_total += get_card_value(dealer_card1, dealer_total)
     cards.append(dealer_card1)
-    print "Dealer gets: " + get_card_type(dealer_card1) + " of " + get_suit_type(dealer_card1)
-    print "Dealer showing: " + str(dealer_total)
-    print "You have: " + str(player_total)
+    print("Dealer gets: {} of {}".format(get_card_type(dealer_card1), get_suit_type(dealer_card1)))
+    print("Dealer showing: {}".format(str(dealer_total)))
+    print("You have: {}".format(str(player_total)))
     ans = raw_input('Do you want to hit? ')
     while choice(ans) and player_total < 21:
         player_card = deck.pop()
         cards.append(player_card)
-        print get_card_type(player_card) + " of " + get_suit_type(player_card)
+        print("{} of {}".format(get_card_type(player_card),  get_suit_type(player_card)))
         player_total += get_card_value(player_card, player_total)
         if player_total == 21:
-            print "You got 21!"
+            print("You got 21!")
         elif player_total > 21:
-            print "You have: " + str(player_total)
-            print "You Busted."
+            print("You have: {}".format(str(player_total)))
+            print("You Busted.")
         else:
-            print "You have: " + str(player_total)
+            print("You have: {}".format(str(player_total)))
             ans = raw_input('Do you want to hit? ')
     while dealer_total <= 17 and player_total < 21:
         dealer_card = deck.pop()
         cards.append(dealer_card)
-        print "Dealer gets: " + get_card_type(dealer_card) + " of " + get_suit_type(dealer_card)
+        print("Dealer gets: {} of {}".format(get_card_type(dealer_card), get_suit_type(dealer_card)))
         dealer_total += get_card_value(dealer_card, dealer_total)
-        print "Dealer has " + str(dealer_total)
+        print("Dealer has {}".format(str(dealer_total)))
     money = find_winner(player_total, dealer_total, bet, money)
     for item in cards:
         deck.append(item)
@@ -136,9 +136,9 @@ def play_game(bet, money):
 def win_loss():
     """Determine if a player has won or lost money"""
     if money > 100:
-        print "You won $" + str(money - 100)
+        print("You won ${}".format(str(money - 100)))
     else:
-        print "You lost $" + str(100 - money)
+        print("You lost ${}".format(str(100 - money)))
 
 
 intro()
@@ -146,13 +146,13 @@ ans = 'y'
 while choice(ans):
     amount = raw_input("How much do you want to bet? ")
     while amount.isalpha():
-        print "That is not a number"
+        print("That is not a number")
         amount = raw_input("How much do you want to bet? ")
     bet = int(amount)
     money = play_game(bet, money)
-    print "You have $" + str(money)
+    print("You have ${}".format(str(money)))
     if money <= 0:
-        print "You are out of money."
+        print("You are out of money.")
         break;
     else:
         ans = raw_input('Do you want to play again? ')
